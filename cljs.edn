@@ -1,0 +1,7 @@
+{:main noc.browser-check
+ :output-to "public/js/noc.js"
+ :output-dir "public/js/out"
+ :asset-path "out"
+ :optimizations :simple
+ :pretty-print false
+ :source-map "public/js/noc.js.map"}

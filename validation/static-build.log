@@ -1,0 +1,32 @@
+👷🏼 Clerk is building 22 notebooks…
+🧐 Parsing… WARNING: parents already refers to: #'clojure.core/parents in namespace: noc.lessons.ch11, being replaced by: #'noc.lessons.ch11/parents
+Done in 1354.097ms. ✅
+🔬 Analyzing… Done in 13242.001ms. ✅
+🔨 Building "notebooks/acknowledgments.clj"… Done in 46.281ms. ✅
+🔨 Building "notebooks/appendix.clj"… Done in 57.532ms. ✅
+🔨 Building "notebooks/back_cover.clj"… Done in 284.394ms. ✅
+🔨 Building "notebooks/book_index.clj"… Done in 17.329ms. ✅
+🔨 Building "notebooks/ch00.clj"… WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by io.airlift.compress.lz4.UnsafeUtil (file:/Users/a123/.m2/repository/io/airlift/aircompressor/0.27/aircompressor-0.27.jar)
+WARNING: Please consider reporting this to the maintainers of class io.airlift.compress.lz4.UnsafeUtil
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+Done in 449.157ms. ✅
+🔨 Building "notebooks/ch01.clj"… Done in 359.995ms. ✅
+🔨 Building "notebooks/ch02.clj"… Done in 452.426ms. ✅
+🔨 Building "notebooks/ch03.clj"… Done in 431.127ms. ✅
+🔨 Building "notebooks/ch04.clj"… Done in 458.214ms. ✅
+🔨 Building "notebooks/ch05.clj"… Done in 596.311ms. ✅
+🔨 Building "notebooks/ch06.clj"… Done in 512.735ms. ✅
+🔨 Building "notebooks/ch07.clj"… Done in 217.659ms. ✅
+🔨 Building "notebooks/ch08.clj"… Done in 313.145ms. ✅
+🔨 Building "notebooks/ch09.clj"… Done in 249.453ms. ✅
+🔨 Building "notebooks/ch10.clj"… Done in 492.488ms. ✅
+🔨 Building "notebooks/ch11.clj"… Done in 722.090ms. ✅
+🔨 Building "notebooks/examples.clj"… Done in 35.254ms. ✅
+🔨 Building "notebooks/front_matter.clj"… Done in 487.507ms. ✅
+🔨 Building "notebooks/image_credits.clj"… Done in 10.566ms. ✅
+🔨 Building "notebooks/index.clj"… Done in 20.087ms. ✅
+🔨 Building "notebooks/introduction.clj"… Done in 49.282ms. ✅
+🔨 Building "notebooks/laboratory.clj"… Done in 17.208ms. ✅
+📦 Static app bundle created in 4907.245ms. Total build time was 25801.427ms.
+已导出 public/build/index.html；请用 HTTP 静态服务器打开。

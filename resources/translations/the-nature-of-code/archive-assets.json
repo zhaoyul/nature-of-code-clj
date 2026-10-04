@@ -1,0 +1,44 @@
+{
+  "schema": "book-assets-v1",
+  "audited_utc": "2026-10-02",
+  "assets": [
+    {
+      "role": "org",
+      "path": "books/completed/the-nature-of-code/book.org",
+      "original_filename": "The_Nature_of_Code_zh_CN_complete.org",
+      "size": 654910,
+      "sha256": "17a1f48e9d96631c5fb2d1ebeed629623d0bd71c979aa820bb45ef5a8f78ab18",
+      "storage": "direct-file",
+      "git_sha": "526cdf744a66dd92ebe80ca9f3ee8c7d74d86db8"
+    },
+    {
+      "role": "epub",
+      "path": "books/completed/the-nature-of-code/book.epub",
+      "original_filename": "The_Nature_of_Code_zh_CN.epub",
+      "size": 16605307,
+      "sha256": "eb65dbd6b16178a3ad0e238bfb327bb088ec4cd40d002d0ff63064a62568e443",
+      "storage": "verified-binary-parts",
+      "manifest": "books/completed/the-nature-of-code/book.epub.parts/manifest.json"
+    },
+    {
+      "role": "images",
+      "path": "books/completed/the-nature-of-code/images.zip",
+      "original_filename": "The_Nature_of_Code_zh_CN_complete_images.zip",
+      "size": 24321453,
+      "sha256": "c2d81b33349515a65eec3f2a9cef7deb5bac682741bae3b7e4444890c0fc9ecc",
+      "storage": "verified-binary-parts",
+      "manifest": "books/completed/the-nature-of-code/images.zip.parts/manifest.json"
+    },
+    {
+      "role": "source",
+      "path": "books/completed/the-nature-of-code/source/original.pdf",
+      "original_filename": "The Nature of Code Simulating Natural Systems with JavaScript (Daniel Shiffman) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "size": 12287181,
+      "sha256": "3279811d04ec272928cec5b23154cdf6d3fed89ef1cf76861eaf65c54e7929f1",
+      "storage": "verified-binary-parts",
+      "manifest": "books/completed/the-nature-of-code/source/original.pdf.parts/manifest.json"
+    }
+  ],
+  "restoration": "python3 scripts/reassemble_asset.py <asset>.parts <asset>; unzip images.zip to restore image files at their archived relative paths"
+}
+

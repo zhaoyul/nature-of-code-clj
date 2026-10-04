@@ -1,0 +1,21 @@
+{:paths ["src" "resources" "notebooks"]
+ :deps {org.clojure/clojure {:mvn/version "1.12.4"}
+        org.clojure/data.json {:mvn/version "2.5.1"}
+        io.github.nextjournal/clerk {:mvn/version "0.18.1158"}}
+ :aliases
+ {:dev {:extra-paths ["dev"]
+        :extra-deps {nrepl/nrepl {:mvn/version "1.3.1"}
+                     org.clojure/clojurescript {:mvn/version "1.12.145"}
+                     quil/quil {:mvn/version "4.3.1563" :exclusions [cljsjs/p5]}}
+        :jvm-opts ["-Djava.awt.headless=true"]
+        :main-opts ["-m" "noc.dev"]}
+  :cljs {:extra-deps {org.clojure/clojurescript {:mvn/version "1.12.145"}
+                      quil/quil {:mvn/version "4.3.1563" :exclusions [cljsjs/p5]}}
+         :main-opts ["-m" "cljs.main" "-co" "cljs.edn" "-c" "noc.browser-check"]}
+  :build {:extra-paths ["dev"]
+          :extra-deps {org.clojure/clojurescript {:mvn/version "1.12.145"}
+                       quil/quil {:mvn/version "4.3.1563" :exclusions [cljsjs/p5]}}
+          :jvm-opts ["-Djava.awt.headless=true"]
+          :exec-fn noc.dev/build!}
+  :test {:extra-paths ["test"]
+         :main-opts ["-m" "noc.test-runner"]}}}

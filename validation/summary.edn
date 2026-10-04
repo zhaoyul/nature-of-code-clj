@@ -1,0 +1,49 @@
+{:validated-on "2026-10-04"
+ :translation {:original-sha256 "17a1f48e9d96631c5fb2d1ebeed629623d0bd71c979aa820bb45ef5a8f78ab18"
+               :sections 19 :images 385 :image-references 387
+               :missing-image-references 0 :visible-caption-uses 387}
+ :coverage {:numbered-examples 99 :companion-examples 67
+            :registered-examples 166 :notebooks 22}
+ :jvm {:runner :clj-nrepl-eval :tests 28 :assertions 4201
+       :failures 0 :errors 0 :default-example-frames 120
+       :model-tests 20 :model-assertions 1383}
+ :clojure-lessons {:sections 13 :teaching-code-blocks 538 :physical-notebook-cells 538
+                   :independent-evaluations 538 :tests 3 :assertions 2769
+                   :failures 0 :errors 0 :finite-results true
+                   :original-chinese-comment-lines 335
+                   :prose-layout-matches-original-text true
+                   :plain-text-index-blocks 12
+                   :chapter-code-blocks [32 57 55 47 56 82 65 21 35 17 23 38]
+                   :introduction-code-blocks 10
+                   :static-scene-renderer :quil-clojurescript
+                   :scene-transport :url-fragment}
+ :markup-regression {:runner :clj-nrepl-eval :tests 5 :assertions 49
+                     :failures 0 :errors 0
+                     :display-formulas 89 :inline-formulas 244
+                     :code-blocks 550 :images 387 :visible-caption-uses 387
+                     :normalizer-idempotent true :original-org-unchanged true
+                     :chapter05 {:display-formulas 8 :images 59
+                                 :dot-product-code-preserved true
+                                 :projection-code-preserved true}
+                     :browser-review {:status :blocked
+                                      :reason :browser-url-protocol-policy}}
+ :source-content-audit {:scope :original-org-and-derived-markdown
+                        :sections 19 :headings 516 :tables 19
+                        :chinese-body-characters 94344
+                        :chinese-character-order-matches true
+                        :code-content-matches true}
+ :browser {:validated-phase :before-teaching-code-rewrite
+           :checks 170 :models 166 :interaction-checks 4
+           :failures 0 :console-errors 0
+           :bundle-sha256 "51fd49aabcdc58b87a45db4ee980c073d77dabd67811b7cbc59132df48d75f2f"
+           :controls {:pause true :reset true :single-step true}
+           :renderer :quil-clojurescript}
+ :static-export {:path "public/build/index.html" :bytes 42110299
+                 :sha256 "3799f7d8de51e7108e58b9d6708e646e48b2e65db6d6104e9d32c86aa2960d20"
+                 :notebooks-built 22
+                 :browser-compile-successful true
+                 :bundle-sha256 "86b7209b8b30645e0bdc028adca65cf4f9cbfb5f8596c4b31e5498f37e4c5599"
+                 :runtime-and-export-bundles-identical true
+                 :browser-review {:status :blocked :reason :browser-url-protocol-policy}}
+ :servers {:clerk "http://localhost:7779" :nrepl-port 7878
+           :static-preview "http://localhost:7782"}}

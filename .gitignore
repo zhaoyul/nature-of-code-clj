@@ -1,0 +1,13 @@
+.cpcache/
+.clerk/
+.lsp/
+.nrepl-port
+public/js/out/
+public/js/noc.js
+public/js/noc.js.map
+public/js/check.js
+public/js/check.js.map
+public/build/
+target/
+.DS_Store
+__pycache__/

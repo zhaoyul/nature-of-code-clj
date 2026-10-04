@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>The Nature of Code · Quil 示例</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;padding:12px;background:#fcfdf9;color:#24342d;font:14px/1.45 system-ui,-apple-system,"PingFang SC",sans-serif}
+    h1{font-size:15px;margin:0 0 9px;font-weight:650}#canvas{border-radius:6px;overflow:hidden;line-height:0;background:#f4f6ed}canvas{max-width:100%;height:auto!important;display:block}
+    #toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin:9px 0}button{font:inherit;border:1px solid #b8cbbf;border-radius:6px;padding:4px 11px;background:white;color:#244937;cursor:pointer}button:hover{background:#e6efe3}#status{font-size:12px;color:#587363}
+    #parameters{display:flex;flex-wrap:wrap;gap:5px 16px;max-height:71px;overflow:auto}label{display:flex;align-items:center;gap:5px;font-size:12px}input[type=range]{width:105px;accent-color:#457b57}output{min-width:32px;font-variant-numeric:tabular-nums}#error{color:#a33636;white-space:pre-wrap;font-size:12px}#help{margin-top:5px;font-size:11px;color:#6d7e73}
+  </style>
+</head>
+<body>
+  <h1 id="title">正在加载 Quil 示例……</h1>
+  <div id="canvas"></div>
+  <div id="toolbar"><button id="pause">暂停</button><button id="step">前进一步</button><button id="reset">重置</button><span id="status"></span></div>
+  <div id="parameters"></div>
+  <div id="help">可直接操作画布；滚动离开画布时自动暂停计算。</div>
+  <div id="error"></div>
+  <script src="noc.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "source_repository": "RedCreationTech/org-epub-books",
+  "source_path": "books/completed/the-nature-of-code/book.org",
+  "source_url": "https://github.com/RedCreationTech/org-epub-books/blob/main/books/completed/the-nature-of-code/book.org",
+  "source_git_blob_sha": "526cdf744a66dd92ebe80ca9f3ee8c7d74d86db8",
+  "source_sha256": "17a1f48e9d96631c5fb2d1ebeed629623d0bd71c979aa820bb45ef5a8f78ab18",
+  "source_bytes": 654910,
+  "retrieved_client_date": "2026-10-04",
+  "images_archive_sha256": "c2d81b33349515a65eec3f2a9cef7deb5bac682741bae3b7e4444890c0fc9ecc",
+  "images": 385,
+  "image_references": 387,
+  "missing_image_references": 0,
+  "conversion": "pandoc org -> markdown_strict+tex_math_dollars --wrap=none; full original Org retained verbatim; image paths adjusted to sibling images directory",
+  "sections": 19,
+  "parsed_numbered_example_headings": 98,
+  "clerk_normalization": "HTML tables converted to GFM pipe tables; inline table mathematics converted to TeX; display-math delimiters isolated from prose; verified inline-code and formula conversion losses repaired against original Org; all 387 original Chinese captions restored as visible prose with original TeX; original Org archive unchanged"
+}

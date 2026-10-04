@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>Quil 浏览器集成检查</title>
+<style>body{font:14px/1.5 system-ui,sans-serif;color:#24342d;background:#fcfdf9;margin:20px}canvas{max-width:100%;height:auto!important}#canvas{max-width:640px}#parameters{display:none}#check-results{max-height:190px;overflow:auto;font-family:monospace}button{padding:5px 12px;margin:4px;cursor:pointer}#error{color:#b53333}</style></head>
+<body>
+<h1>Quil 浏览器集成检查</h1>
+<p>每个示例先在浏览器执行 20 个有限步，再交给真实的 Quil 画布绘制；逐个移除画布和计时器。</p>
+<button onclick="noc.browser_check.run_BANG_()">运行全部示例检查</button>
+<p id="check-summary" data-status="idle">尚未运行</p>
+<div id="check-results"></div>
+<h2 id="title"></h2><div id="canvas"></div>
+<div id="toolbar"><button id="pause">暂停</button><button id="step">前进一步</button><button id="reset">重置</button><span id="status"></span></div>
+<div id="parameters"></div><div id="error"></div>
+<script src="noc.js"></script>
+</body></html>

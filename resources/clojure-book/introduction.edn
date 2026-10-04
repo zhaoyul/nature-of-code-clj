@@ -1,0 +1,12 @@
+[
+{:index 0 :source "(let [x 0] (inc x))"}
+{:index 1 :source "(let [[x y] [10 20] [vx vy] [2 -1]]\n  [(+ x vx) (+ y vy)])"}
+{:index 2 :source "(let [width 640 height 240 spacing 60]\n  (notebook/scene\n   (vec (concat [[:background 255] [:fill 240 99 164]]\n                (for [x (range 0 width spacing)] [:circle x (/ height 2) 40])))\n   {:width width :height height}))"}
+{:index 3 :source "(let [width 640 height 240 spacing 40]\n  (notebook/scene\n   (vec (concat [[:background 255] [:fill 240 99 164]]\n                (for [x (range 0 width spacing) y (range 0 height spacing)]\n                  [:circle x y 24])))\n   {:width width :height height}))"}
+{:index 4 :source "(notebook/scene [[:background 255] [:fill 240 99 164] [:circle 320 120 200]]\n                {:height 240})"}
+{:index 5 :source "{:width 640 :height 240 :renderer :quil}"}
+{:index 6 :source "(notebook/scene [[:background 255]] {:height 240})"}
+{:index 7 :source "(notebook/scene [[:fill 240 99 164] [:circle 320 120 200]] {:height 240})"}
+{:index 8 :source "(binding [m/*rng* (m/seeded 42)]\n  (notebook/scene\n   (vec (concat [[:background 255] [:rect-mode :center] [:fill 127]]\n                (repeatedly 40 #(vector :rect (m/random 640) (m/random 240) 20 20))))\n   {:height 240}))"}
+{:index 9 :source "(binding [m/*rng* (m/seeded 42)]\n  (notebook/scene\n   (vec (concat [[:background 255] [:fill 0 25] [:stroke 0 50]]\n                (repeatedly 80 #(vector :circle (m/random 640) (m/random 240) 48))))\n   {:height 240}))"}
+]

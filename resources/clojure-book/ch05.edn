@@ -1,0 +1,185 @@
+[
+ {:index 0
+  :source "(let [vehicle {:position [(/ (:width lesson/env) 2)\n                         (/ (:height lesson/env) 2)]\n               :velocity [0 0]\n               :acceleration [0 0]}]\n  vehicle)"
+  :note "类的实例字段改为不可变map；后续函数返回更新后的载具。"}
+ {:index 1
+  :source "(let [desired [8 0]\n      velocity [2 -1]\n      steer (m/v- desired velocity)]\n  steer)"}
+ {:index 2
+  :source "(let [target (:mouse lesson/env)\n      position (:position lesson/vehicle)\n      desired (m/v- target position)]\n  desired)"}
+ {:index 3
+  :source "(let [vehicle {:position [320 180] :velocity [0 0]\n               :acceleration [0 0] :max-speed 8}]\n  vehicle)"
+  :note "教材留空的参数取可调整初值8，保证片段可以执行。"}
+ {:index 4
+  :source "(let [vehicle lesson/vehicle\n      desired (m/set-mag (m/v- (:mouse lesson/env) (:position vehicle))\n                         (:max-speed vehicle))]\n  desired)"}
+ {:index 5
+  :source "(letfn [(seek [vehicle target]\n          (let [desired (m/set-mag (m/v- target (:position vehicle))\n                                  (:max-speed vehicle))\n                steer (m/v- desired (:velocity vehicle))]\n            (update vehicle :acceleration m/v+ steer)))]\n  (seek lesson/vehicle (:mouse lesson/env)))"}
+ {:index 6
+  :source "(let [vehicle {:position [320 180] :velocity [0 0]\n               :acceleration [0 0] :max-speed 8 :max-force 0.2}]\n  vehicle)"}
+ {:index 7
+  :source "(letfn [(seek [vehicle target]\n          (let [desired (m/set-mag (m/v- target (:position vehicle))\n                                  (:max-speed vehicle))\n                steer (m/limit (m/v- desired (:velocity vehicle))\n                               (:max-force vehicle))]\n            (lesson/apply-force vehicle steer)))]\n  (seek lesson/vehicle (:mouse lesson/env)))"}
+ {:index 8
+  :source "(letfn [(make-vehicle [x y]\n          {:id 0 :position [x y] :velocity [0 0] :acceleration [0 0]\n           :radius 6 :max-speed 8 :max-force 0.2})\n        (apply-force [vehicle force]\n          (update vehicle :acceleration m/v+ force))\n        (advance [vehicle]\n          (let [velocity (m/limit (m/v+ (:velocity vehicle)\n                                      (:acceleration vehicle))\n                                  (:max-speed vehicle))]\n            (assoc vehicle :velocity velocity\n                   :position (m/v+ (:position vehicle) velocity)\n                   :acceleration [0 0])))\n        (seek [vehicle target]\n          (let [desired (m/set-mag (m/v- target (:position vehicle))\n                                  (:max-speed vehicle))\n                steer (m/limit (m/v- desired (:velocity vehicle))\n                               (:max-force vehicle))]\n            (apply-force vehicle steer)))\n        (show [vehicle]\n          (lesson/triangle-scene vehicle))]\n  (let [vehicle (-> (make-vehicle 160 180)\n                    (seek (:mouse lesson/env))\n                    advance)]\n    (notebook/scene (d/scene (d/background) (show vehicle)))))"
+  :note "绘图输出是noc.draw指令；相邻示例5.1由同一套向量规则驱动实际Quil画布。"}
+ {:index 9
+  :source "(let [vehicle lesson/vehicle\n      desired (m/set-mag (m/v- (:mouse lesson/env) (:position vehicle))\n                         (:max-speed vehicle))]\n  desired)"}
+ {:index 10
+  :source "(let [desired (m/v- (:mouse lesson/env) (:position lesson/vehicle))]\n  (m/v* desired 0.5))"}
+ {:index 11
+  :source "(let [desired (m/v- (:mouse lesson/env) (:position lesson/vehicle))]\n  (m/v* desired 0.05))"}
+ {:index 12
+  :source "(letfn [(arrive [vehicle target]\n          (let [delta (m/v- target (:position vehicle))\n                distance (m/mag delta)\n                speed (if (< distance 100)\n                        (m/map-range distance 0 100 0 (:max-speed vehicle))\n                        (:max-speed vehicle))\n                desired (m/set-mag delta speed)\n                steer (m/limit (m/v- desired (:velocity vehicle))\n                               (:max-force vehicle))]\n            (lesson/apply-force vehicle steer)))]\n  (arrive lesson/vehicle [190 190]))"}
+ {:index 13
+  :source "(letfn [(boundaries [vehicle offset width height]\n          (let [[x y] (:position vehicle)\n                [vx vy] (:velocity vehicle)\n                speed (:max-speed vehicle)\n                desired-x (cond (< x offset) [speed vy]\n                                (> x (- width offset)) [(- speed) vy])\n                desired (cond (< y offset) [vx speed]\n                              (> y (- height offset)) [vx (- speed)]\n                              :else desired-x)]\n            (if desired\n              (lesson/apply-force vehicle\n                (lesson/steer vehicle (m/set-mag desired speed)))\n              vehicle)))]\n  (boundaries (assoc lesson/vehicle :position [10 180]) 40 640 360))"
+  :note "nil对应尚未需要转向；保持原例先检查x、再检查y的顺序。"}
+ {:index 14
+  :source "(let [resolution 20\n      cols (long (m/floor (/ (:width lesson/env) resolution)))\n      rows (long (m/floor (/ (:height lesson/env) resolution)))\n      flow {:resolution resolution :cols cols :rows rows\n            :field (vec (repeat cols (vec (repeat rows nil))))}]\n  (select-keys flow [:resolution :cols :rows]))"}
+ {:index 15
+  :source "(let [resolution 10\n      cols (long (m/floor (/ (:width lesson/env) resolution)))\n      rows (long (m/floor (/ (:height lesson/env) resolution)))]\n  {:resolution resolution :cols cols :rows rows\n   :field (vec (repeat cols (vec (repeat rows nil))))})"}
+ {:index 16
+  :source "(let [cols 4 rows 3\n      field (mapv (fn [_] (mapv (fn [_] [1 0]) (range rows)))\n                  (range cols))]\n  field)"}
+ {:index 17
+  :source "(binding [m/*rng* (m/seeded 42)]\n  (let [cols 4 rows 3]\n    (mapv (fn [_] (mapv (fn [_] (m/random-vector)) (range rows)))\n          (range cols))))"}
+ {:index 18
+  :source "(let [cols 4 rows 3\n      field (mapv (fn [column]\n                    (mapv (fn [row]\n                            (let [angle (* m/tau (m/noise (* column 0.1)\n                                                        (* row 0.1)))]\n                              (m/from-angle angle)))\n                          (range rows)))\n                  (range cols))]\n  field)"}
+ {:index 19
+  :source "(let [cols 4 rows 3 width 640 height 360]\n  (mapv (fn [column]\n          (mapv (fn [row]\n                  (let [x (* column (/ width cols))\n                        y (* row (/ height rows))\n                        to-center [(- (/ width 2) x) (- (/ height 2) y)]]\n                    (m/rotate to-center (/ m/pi 2))))\n                (range rows)))\n        (range cols)))"}
+ {:index 20
+  :source "(let [[x y] (:position lesson/vehicle)\n      resolution (:resolution lesson/flow)]\n  {:column (long (m/floor (/ x resolution)))\n   :row (long (m/floor (/ y resolution)))})"}
+ {:index 21
+  :source "(letfn [(lookup [{:keys [resolution cols rows field]} [x y]]\n          (let [column (long (m/clamp (m/floor (/ x resolution)) 0 (dec cols)))\n                row (long (m/clamp (m/floor (/ y resolution)) 0 (dec rows)))]\n            (get-in field [column row])))]\n  (lookup lesson/flow (:position lesson/vehicle)))"
+  :note "Clojure向量不可变，因此无需copy即可安全返回。"}
+ {:index 22
+  :source "(letfn [(make-flow [resolution seed]\n          (let [cols (long (m/floor (/ (:width lesson/env) resolution)))\n                rows (long (m/floor (/ (:height lesson/env) resolution)))\n                offset (* seed 0.01)]\n            {:resolution resolution :cols cols :rows rows\n             :field (mapv (fn [column]\n                            (mapv (fn [row]\n                                    (m/from-angle\n                                      (* m/tau (m/noise (+ offset (* column 0.1))\n                                                          (+ offset (* row 0.1))))))\n                                  (range rows)))\n                          (range cols))}))\n        (lookup [flow position]\n          (lesson/lookup flow position))]\n  (let [flow (make-flow 20 42)]\n    {:cols (:cols flow) :rows (:rows flow)\n     :direction (lookup flow (:position lesson/vehicle))}))"
+  :note "noc.math的Perlin噪声使用确定梯度；种子转换为噪声坐标偏移以生成不同的连续流场。"}
+ {:index 23
+  :source "(letfn [(follow-flow [vehicle flow]\n          (let [desired (m/set-mag (lesson/lookup flow (:position vehicle))\n                                  (:max-speed vehicle))\n                steer (lesson/steer vehicle desired)]\n            (lesson/apply-force vehicle steer)))]\n  (follow-flow lesson/vehicle lesson/flow))"}
+ {:index 24
+  :source "(let [a [-3 5]\n      b [10 1]\n      n (m/dot a b)]\n  n)"}
+ {:index 25
+  :source "(letfn [(dot [[ax ay az] [bx by bz]]\n          (+ (* ax bx) (* ay by) (* (or az 0) (or bz 0))))]\n  (dot [-3 5] [10 1]))"
+  :note "二维输入的第三个分量补为0；同一函数也接受三维向量。"}
+ {:index 26
+  :source "(let [a [10 2]\n      b [4 -3]\n      angle (Math/acos (double (/ (m/dot a b) (* (m/mag a) (m/mag b)))))]\n  {:radians angle :degrees (* angle (/ 180 m/pi))})"}
+ {:index 27
+  :source "(letfn [(angle-between [a b]\n          (let [denominator (* (m/mag a) (m/mag b))]\n            (if (zero? denominator)\n              0\n              (Math/acos (double (m/clamp (/ (m/dot a b) denominator) -1 1))))))]\n  (angle-between [10 2] [4 -3]))"
+  :note "限制余弦值避免浮点误差越界；零向量约定返回0。"}
+ {:index 28
+  :source "(letfn [(make-path [width height]\n          {:radius 20 :start [0 (/ height 3)]\n           :end [width (/ (* height 2) 3)]})\n        (show [{:keys [radius start end]}]\n          (d/scene [[:stroke-weight (* radius 2)] [:stroke 0 100]]\n                   (d/line start end [0 100])\n                   [[:stroke-weight 1]] (d/line start end [0])))]\n  (notebook/scene (show (make-path 640 360))))"}
+ {:index 29
+  :source "(let [vehicle lesson/vehicle\n      future (m/v+ (:position vehicle) (m/set-mag (:velocity vehicle) 25))]\n  future)"}
+ {:index 30
+  :source "(let [future lesson/future\n      path lesson/path\n      a (m/v- future (:start path))]\n  a)"}
+ {:index 31
+  :source "(let [path lesson/path\n      b (m/v- (:end path) (:start path))]\n  b)"}
+ {:index 32
+  :source "(let [path lesson/path\n      a (m/v- lesson/future (:start path))\n      b (m/v- (:end path) (:start path))\n      theta (lesson/angle-between a b)\n      distance (* (m/mag a) (m/cos theta))\n      normal-point (m/v+ (:start path) (m/set-mag b distance))]\n  normal-point)"}
+ {:index 33
+  :source "(let [path lesson/path\n      a (m/v- lesson/future (:start path))\n      b (m/v- (:end path) (:start path))\n      theta (lesson/angle-between a b)\n      distance (* (m/mag a) (m/cos theta))]\n  (m/v+ (:start path) (m/set-mag b distance)))"}
+ {:index 34
+  :source "(let [path lesson/path\n      a (m/v- lesson/future (:start path))\n      b (m/normalize (m/v- (:end path) (:start path)))\n      scalar-projection (m/dot a b)\n      normal-point (m/v+ (:start path) (m/v* b scalar-projection))]\n  {:scalar-projection scalar-projection :normal-point normal-point})"
+  :note "标量投影可以为负；用v*保留投影符号，避免负长度处理歧义。"}
+ {:index 35
+  :source "(let [vehicle lesson/vehicle path lesson/path\n      future lesson/future normal-point lesson/normal\n      target (m/v+ normal-point\n                   (m/set-mag (m/v- (:end path) (:start path)) 25))\n      distance (m/distance future normal-point)]\n  (if (> distance (:radius path))\n    (lesson/seek vehicle target)\n    vehicle))"}
+ {:index 36
+  :source "(let [vehicle lesson/vehicle path lesson/path\n      future lesson/future normal-point lesson/normal\n      distance (m/distance future normal-point)]\n  (if (> distance (:radius path))\n    (let [ahead (m/set-mag (m/v- (:end path) (:start path)) 25)\n          target (m/v+ normal-point ahead)]\n      (lesson/seek vehicle target))\n    vehicle))"}
+ {:index 37
+  :source "(letfn [(follow-path [vehicle {:keys [start end radius]}]\n          (let [future (m/v+ (:position vehicle)\n                             (m/set-mag (:velocity vehicle) 25))\n                normal-point (lesson/normal-point future start end)\n                target (m/v+ normal-point (m/set-mag (m/v- end start) 25))\n                distance (m/distance normal-point future)]\n            (if (> distance radius)\n              (lesson/seek vehicle target)\n              vehicle)))]\n  (follow-path lesson/vehicle lesson/path))"}
+ {:index 38
+  :source "(letfn [(normal-point [position a b]\n          (let [vector-a (m/v- position a)\n                vector-b (m/normalize (m/v- b a))\n                projection (m/v* vector-b (m/dot vector-a vector-b))]\n            (m/v+ a projection)))]\n  (normal-point lesson/future (:start lesson/path) (:end lesson/path)))"}
+ {:index 39
+  :source "(letfn [(make-path [] {:radius 20 :points []})\n        (add-point [path x y] (update path :points conj [x y]))\n        (show [{:keys [radius points]}]\n          [[:stroke 200] [:stroke-weight (* radius 2)] [:no-fill]\n           [:polyline points false] [:stroke 0] [:stroke-weight 1]\n           [:polyline points false]])]\n  (-> (make-path)\n      (add-point 0 120)\n      (add-point 160 70)\n      (add-point 320 280)\n      show\n      notebook/scene))"}
+ {:index 40
+  :source "(let [future lesson/future]\n  (mapv (fn [[a b]]\n          {:segment [a b] :normal-point (lesson/normal-point future a b)})\n        (partition 2 1 (:points lesson/poly-path))))"}
+ {:index 41
+  :source "(let [a [0 120] b [160 70]\n      normal-point (lesson/normal-point [200 90] a b)]\n  (if (or (< (first normal-point) (first a))\n          (> (first normal-point) (first b)))\n    b\n    normal-point))"
+  :note "原例的x范围检查适用于从左向右的路径；任意方向路径可用ch/nearest-point的投影参数限制。"}
+ {:index 42
+  :source "(let [future lesson/future\n      best (reduce\n             (fn [record [a b]]\n               (let [normal (lesson/normal-point future a b)\n                     normal (if (or (< (first normal) (first a))\n                                    (> (first normal) (first b))) b normal)\n                     distance (m/distance future normal)]\n                 (if (< distance (:distance record))\n                   {:distance distance :normal normal\n                    :target (m/v+ normal (m/set-mag (m/v- b a) 25))}\n                   record)))\n             {:distance Double/POSITIVE_INFINITY :target nil}\n             (partition 2 1 (:points lesson/poly-path)))]\n  best)"
+  :note "只在刷新最短距离时保存对应线段的前方目标，避免原片段在之后的线段上继续累加方向。"}
+ {:index 43
+  :source "(binding [m/*rng* (m/seeded 42)]\n  (let [vehicles (mapv (fn [id]\n                         (lesson/make-vehicle id (m/random (:width lesson/env))\n                                              (m/random (:height lesson/env))))\n                       (range 100))]\n    {:count (count vehicles) :sample (take 3 vehicles)}))"}
+ {:index 44
+  :source "(let [vehicles (mapv lesson/advance lesson/vehicles)]\n  (notebook/scene (lesson/scene vehicles)))"}
+ {:index 45
+  :source "(let [mouse (:mouse lesson/env)]\n  (lesson/seek lesson/vehicle mouse))"}
+ {:index 46
+  :source "(let [vehicle lesson/vehicle\n      neighbors []\n      force (lesson/separate-force vehicle neighbors)]\n  (lesson/apply-force vehicle force))"
+  :note "分离行为必须感知其他载具；不给邻居时返回零力，下一块传入整个群体。"}
+ {:index 47
+  :source "(let [vehicle lesson/vehicle\n      force (lesson/separate-force vehicle lesson/vehicles)]\n  (lesson/apply-force vehicle force))"}
+ {:index 48
+  :source "(binding [m/*rng* (m/seeded 42)]\n  (let [vehicles (mapv (fn [id]\n                         (lesson/make-vehicle id (m/random 640) (m/random 240)))\n                       (range 100))\n        next-vehicles (mapv (fn [vehicle]\n                              (-> vehicle\n                                  (lesson/apply-force\n                                    (lesson/separate-force vehicle vehicles))\n                                  lesson/advance))\n                            vehicles)]\n    (notebook/scene (lesson/scene next-vehicles))))"}
+ {:index 49
+  :source "(letfn [(separate [vehicle vehicles]\n          ;; 尚未加入邻居规则时，分离力为零。\n          [0 0])]\n  (separate lesson/vehicle lesson/vehicles))"}
+ {:index 50
+  :source "(let [vehicle lesson/vehicle\n      desired-separation 20]\n  (filterv (fn [other]\n             (let [distance (m/distance (:position vehicle) (:position other))]\n               (and (not= (:id vehicle) (:id other))\n                    (< distance desired-separation))))\n           lesson/vehicles))"}
+ {:index 51
+  :source "(let [vehicle lesson/vehicle other (second lesson/vehicles)\n      distance (m/distance (:position vehicle) (:position other))]\n  (when (and (not= (:id vehicle) (:id other)) (< distance 20))\n    (m/normalize (m/v- (:position vehicle) (:position other)))))"}
+ {:index 52
+  :source "(let [vehicle lesson/vehicle\n      near (lesson/nearby vehicle lesson/vehicles 20)\n      sum (reduce m/v+ [0 0]\n                  (map #(m/normalize (m/v- (:position vehicle) (:position %))) near))\n      count-near (count near)]\n  {:count count-near :sum sum\n   :average (if (pos? count-near) (m/vdiv sum count-near) [0 0])})"}
+ {:index 53
+  :source "(let [vehicle lesson/vehicle\n      near (lesson/nearby vehicle lesson/vehicles 20)\n      sum (reduce m/v+ [0 0]\n                  (map #(m/normalize (m/v- (:position vehicle) (:position %))) near))]\n  (if (seq near)\n    (let [desired (m/set-mag sum (:max-speed vehicle))\n          steer (lesson/steer vehicle desired)]\n      (lesson/apply-force vehicle steer))\n    vehicle))"}
+ {:index 54
+  :source "(letfn [(separate [vehicle vehicles]\n          (let [near (lesson/nearby vehicle vehicles (* 2 (:radius vehicle)))\n                sum (reduce m/v+ [0 0]\n                            (map (fn [other]\n                                   (let [diff (m/v- (:position vehicle) (:position other))\n                                         distance (m/mag diff)]\n                                     (m/set-mag diff (/ 1.0 distance)))) near))]\n            (if (seq near)\n              (lesson/apply-force vehicle\n                (lesson/steer vehicle (m/set-mag sum (:max-speed vehicle))))\n              vehicle)))]\n  (separate lesson/vehicle lesson/vehicles))"
+  :note "只检查0<距离的邻居，防止重合载具导致1/d除零。"}
+ {:index 55
+  :source "(let [wind [0.001 0]\n      gravity [0 0.1]]\n  (-> lesson/vehicle\n      (lesson/apply-force wind)\n      (lesson/apply-force gravity)))"}
+ {:index 56
+  :source "(letfn [(apply-behaviors [vehicle vehicles target]\n          (-> vehicle\n              (lesson/apply-force (lesson/separate-force vehicle vehicles))\n              (lesson/seek target)))]\n  (apply-behaviors lesson/vehicle lesson/vehicles (:mouse lesson/env)))"}
+ {:index 57
+  :source "(letfn [(apply-behaviors [vehicle vehicles target]\n          (let [separate (lesson/separate-force vehicle vehicles)\n                seek (lesson/seek-force vehicle target)]\n            (-> vehicle\n                (lesson/apply-force separate)\n                (lesson/apply-force seek))))]\n  (apply-behaviors lesson/vehicle lesson/vehicles (:mouse lesson/env)))"}
+ {:index 58
+  :source "(letfn [(seek-force [vehicle target]\n          (let [desired (m/set-mag (m/v- target (:position vehicle))\n                                  (:max-speed vehicle))\n                steer (m/limit (m/v- desired (:velocity vehicle))\n                               (:max-force vehicle))]\n            steer))]\n  (seek-force lesson/vehicle (:mouse lesson/env)))"
+  :note "seek-force只返回转向力，不同时施力，避免行为组合时重复施加同一力。"}
+ {:index 59
+  :source "(let [vehicle lesson/vehicle\n      separate (m/v* (lesson/separate-force vehicle lesson/vehicles) 1.5)\n      seek (m/v* (lesson/seek-force vehicle (:mouse lesson/env)) 0.5)]\n  (-> vehicle\n      (lesson/apply-force separate)\n      (lesson/apply-force seek)))"}
+ {:index 60
+  :source "(let [vehicle lesson/vehicle\n      near (lesson/nearby vehicle lesson/vehicles 50)\n      separation (lesson/separate-force vehicle lesson/vehicles)\n      alignment (if (seq near)\n                  (lesson/steer vehicle\n                    (m/set-mag (lesson/average-vector (map :velocity near))\n                               (:max-speed vehicle))) [0 0])\n      cohesion (if (seq near)\n                 (lesson/seek-force vehicle\n                   (lesson/average-vector (map :position near))) [0 0])]\n  (-> vehicle\n      (lesson/apply-force (m/v* separation 1.5))\n      (lesson/apply-force (m/v* alignment 1.0))\n      (lesson/apply-force (m/v* cohesion 1.0))))"}
+ {:index 61
+  :source "(let [vehicle lesson/vehicle\n      boids lesson/vehicles\n      sum (reduce m/v+ [0 0] (map :velocity boids))\n      average (if (seq boids) (m/vdiv sum (count boids)) [0 0])\n      desired (m/set-mag average (:max-speed vehicle))]\n  (lesson/steer vehicle desired))"}
+ {:index 62
+  :source "(letfn [(align [vehicle boids]\n          (let [near (lesson/nearby vehicle boids 50)]\n            (if (seq near)\n              (let [average (lesson/average-vector (map :velocity near))]\n                (lesson/steer vehicle (m/set-mag average (:max-speed vehicle))))\n              [0 0])))]\n  (align lesson/vehicle lesson/vehicles))"}
+ {:index 63
+  :source "(letfn [(cohesion [vehicle boids]\n          (let [near (lesson/nearby vehicle boids 50)]\n            (if (seq near)\n              (let [center (lesson/average-vector (map :position near))]\n                (lesson/seek-force vehicle center))\n              [0 0])))]\n  (cohesion lesson/vehicle lesson/vehicles))"}
+ {:index 64
+  :source "(letfn [(make-flock [] {:boids []})\n        (add-boid [flock boid] (update flock :boids conj boid))\n        (run [flock] (update flock :boids lesson/flock-step))]\n  (-> (make-flock)\n      (add-boid lesson/vehicle)\n      (add-boid (second lesson/vehicles))\n      run))"}
+ {:index 65
+  :source "(binding [m/*rng* (m/seeded 42)]\n  (let [boids (mapv (fn [id]\n                      (assoc (lesson/make-vehicle id 320 120)\n                             :velocity (m/random-vector)))\n                    (range 120))\n        flock {:boids boids}\n        next-flock (update flock :boids lesson/flock-step)]\n    (notebook/scene (lesson/scene (:boids next-flock)))))"}
+ {:index 66
+  :source "(let [boids []]\n  boids)"}
+ {:index 67
+  :source "(let [resolution 40\n      cols (long (m/floor (/ (:width lesson/env) resolution)))\n      rows (long (m/floor (/ (:height lesson/env) resolution)))]\n  {:resolution resolution :cols cols :rows rows\n   :grid (vec (repeat cols (vec (repeat rows nil))))})"}
+ {:index 68
+  :source "(let [cols 4 rows 3\n      grid (mapv (fn [_] (mapv (fn [_] []) (range rows))) (range cols))]\n  grid)"}
+ {:index 69
+  :source "(let [resolution 40\n      cols (long (m/floor (/ 640 resolution)))\n      rows (long (m/floor (/ 360 resolution)))\n      empty-grid (vec (repeat cols (vec (repeat rows []))))\n      grid (reduce (fn [grid boid]\n                     (let [[x y] (:position boid)\n                           column (long (m/clamp (m/floor (/ x resolution)) 0 (dec cols)))\n                           row (long (m/clamp (m/floor (/ y resolution)) 0 (dec rows)))]\n                       (update-in grid [column row] conj boid)))\n                   empty-grid lesson/vehicles)]\n  {:occupied-cells (count (filter seq (mapcat identity grid)))\n   :cell-4-4 (get-in grid [4 4])})"}
+ {:index 70
+  :source "(let [vehicle lesson/vehicle resolution 40\n      grid (ch/grid-index lesson/vehicles resolution)\n      neighbors (ch/grid-neighbors grid vehicle resolution 640 360)\n      force (lesson/flock-force vehicle neighbors)\n      next-vehicle (-> vehicle (lesson/apply-force force) lesson/advance)]\n  (notebook/scene\n    (d/scene (d/background)\n             (lesson/triangle-scene\n               (update next-vehicle :position m/wrap 640 360))\n             (d/label (str \"候选邻居: \" (count neighbors))))))"
+  :note "查询本格及八个相邻格，避免格子边界两侧的近邻被漏掉；完整四叉树示例5.13复用ch/quadtree与ch/query-tree。"}
+ {:index 71
+  :source "(letfn [(magnitude [[x y]]\n          (m/sqrt (+ (* x x) (* y y))))]\n  (magnitude [6 8]))"}
+ {:index 72
+  :source "(let [v [6 9]]\n  (when (> (m/mag v) 10)\n    {:outside? true :magnitude (m/mag v)}))"}
+ {:index 73
+  :source "(letfn [(magnitude-squared [[x y]]\n          (+ (* x x) (* y y)))]\n  (let [v [6 9]]\n    (when (> (magnitude-squared v) 100)\n      {:outside? true :magnitude-squared (magnitude-squared v)})))"}
+ {:index 74
+  :source "(let [values (mapv (fn [_] (m/sin m/pi)) (range 10000))]\n  {:calls (count values) :sample (take 3 values)})"
+  :note "返回有限摘要，避免在notebook输出10000行；计算次数保持原例。"}
+ {:index 75
+  :source "(let [radians (fn [degrees] (* degrees (/ m/pi 180)))\n      sin-values (mapv #(m/sin (radians %)) (range 360))\n      cos-values (mapv #(m/cos (radians %)) (range 360))]\n  {:sin-values sin-values :cos-values cos-values})"}
+ {:index 76
+  :source "(let [sin-values (mapv #(m/sin (* % (/ m/pi 180))) (range 360))\n      angle 180\n      values (mapv (fn [_] (nth sin-values angle)) (range 10000))]\n  {:lookups (count values) :sample (take 3 values)})"}
+ {:index 77
+  :source "(let [vehicles lesson/vehicles\n      updated (mapv (fn [vehicle]\n                      (let [mouse (vec (:mouse lesson/env))]\n                        (lesson/seek vehicle mouse))) vehicles)]\n  {:target-constructions (count vehicles) :vehicles updated})"
+  :note "故意把目标构造放在循环内，用于对比下一块的共享目标。"}
+ {:index 78
+  :source "(let [mouse (:mouse lesson/env)\n      updated (mapv #(lesson/seek % mouse) lesson/vehicles)]\n  {:target-constructions 1 :vehicles updated})"}
+ {:index 79
+  :source "(let [mouse (atom [0 0])\n      update-frame (fn [target vehicles]\n                     (reset! mouse target)\n                     (mapv #(lesson/seek % @mouse) vehicles))]\n  (update-frame (:mouse lesson/env) lesson/vehicles))"
+  :note "atom保存跨帧目标。Clojure不可变向量仍会分配新值；它共享一次更新，不声称消除向量分配。"}
+ {:index 80
+  :source "(let [vehicle lesson/vehicle\n      desired (m/set-mag (m/v- (:mouse lesson/env) (:position vehicle))\n                         (:max-speed vehicle))\n      steer (m/limit (m/v- desired (:velocity vehicle)) (:max-force vehicle))]\n  steer)"}
+ {:index 81
+  :source "(let [vehicle lesson/vehicle]\n  (-> (m/v- (:mouse lesson/env) (:position vehicle))\n      (m/set-mag (:max-speed vehicle))\n      (m/v- (:velocity vehicle))\n      (m/limit (:max-force vehicle))))"
+  :note "用线程宏消除临时变量；不可变向量保持值语义，该写法不原地修改输入。"}
+]

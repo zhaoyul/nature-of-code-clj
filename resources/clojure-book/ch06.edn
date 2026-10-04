@@ -1,0 +1,159 @@
+[
+ {:index 0
+  :source "(require '[noc.draw :as d]\n         '[noc.notebook :as notebook])"
+  :note "绘图入口使用notebook/scene；Quil已经由本工程的ClojureScript构建载入，不在正文嵌入JavaScript脚本。"}
+ {:index 1
+  :source "(require '[noc.math :as m]\n         '[noc.chapters.ch06 :as ch])"
+  :note "Matter.js由noc.chapters.ch06的SAT碰撞、冲量响应与距离约束求解器替换，JVM和浏览器共用同一实现。"}
+ {:index 2
+  :source "(let [v1 [1 -1]\n      v2 [1 -1]]\n  {:v1 v1 :v2 v2 :equal? (= v1 v2)})"}
+ {:index 3
+  :source "(let [a [1 -1] b [3 4]\n      result (m/v+ a b)]\n  {:original a :sum result})"
+  :note "向量运算返回新值，原输入保持不变；无需分别维护p5与Matter向量类型。"}
+ {:index 4
+  :source "(let [a [1 -1] b [3 4]\n      c1 (m/v+ a b)\n      c2 (m/v+ a b)]\n  {:c1 c1 :c2 c2})"}
+ {:index 5
+  :source "(let [v1 [1 -1] v2 [1 -1]]\n  {:v1 (m/v* v1 4) :v2 (m/v* v2 4)})"}
+ {:index 6
+  :source "(let [v [3 4]\n      magnitude (m/mag v)\n      unit-vector (m/normalize v)]\n  {:magnitude magnitude :normalized unit-vector})"}
+ {:index 7
+  :source "(let [world (lesson/make-world)\n      dimensions {:width 640 :height 360}]\n  {:world world :dimensions dimensions})"}
+ {:index 8
+  :source "(let [horizontal-gravity (assoc lesson/env :gravity-vector [1 0])\n      no-gravity (assoc lesson/env :gravity-vector [0 0])\n      world (assoc (lesson/make-world) :bodies [lesson/box])]\n  {:horizontal (-> (lesson/step-world world horizontal-gravity) :bodies first :velocity)\n   :zero (-> (lesson/step-world world no-gravity) :bodies first :velocity)})"
+  :note "重力方向通过环境参数传入，不修改全局引擎对象。"}
+ {:index 9
+  :source "(let [create-world lesson/make-world\n      add-vectors m/v+\n      create-box ch/box-body\n      add-body lesson/add-body]\n  (add-body (create-world) (create-box 0 (add-vectors [100 100] [0 0]) 50 50 1)))"
+  :note "使用Clojure命名空间别名或局部函数绑定替代JavaScript对象解构。"}
+ {:index 10
+  :source "(let [x 100 y 100 width 50 height 50\n      box (ch/box-body 0 [x y] width height 1)]\n  box)"}
+ {:index 11
+  :source "(let [width 50 height 50 density 0.002\n      mass (* width height density)\n      box (ch/box-body 0 [100 100] width height mass)\n      settings (assoc lesson/env :restitution 0.8)\n      world (lesson/add-body (lesson/make-world) box)]\n  {:mass (:mass box) :world (lesson/step-world world settings)})"
+  :note "密度乘面积得到质量；恢复系数由本求解器的环境参数控制。当前冲量求解器使用固定0.2摩擦系数，不声称支持Matter的逐体friction选项。"}
+ {:index 12
+  :source "(let [box (assoc lesson/box :velocity [2 0] :angular-velocity 0.1)]\n  (select-keys box [:position :velocity :angle :angular-velocity]))"}
+ {:index 13
+  :source "(let [world (lesson/make-world)\n      box lesson/box]\n  (lesson/add-body world box))"}
+ {:index 14
+  :source "(let [ball (ch/circle-body 0 [100 100] 20 1)\n      settings (assoc lesson/env :restitution 0.8)]\n  (lesson/step-world (lesson/add-body (lesson/make-world) ball) settings))"
+  :note "圆碰撞通过凸多边形近似进行SAT检测；摩擦参数沿用本求解器的固定系数。"}
+ {:index 15
+  :source "(let [world lesson/world\n      commands (ch/world-scene world {:width 640 :height 360})]\n  (notebook/scene commands))"
+  :note "渲染器消费世界快照并输出Quil画布，与物理更新解耦。"}
+ {:index 16
+  :source "(let [world lesson/world\n      snapshots (take 4 (iterate lesson/step-world world))]\n  (mapv #(mapv (fn [body] (select-keys body [:id :position :angle])) (:bodies %))\n        snapshots))"
+  :note "notebook以有限帧展示状态变化；相邻编号示例的Quil update循环持续调用同一物理函数。"}
+ {:index 17
+  :source "(let [box (assoc (ch/box-body 0 [100 100] 50 50 1)\n                 :velocity [5 0] :angular-velocity 0.1)\n      ground (ch/static-body (ch/box-body 1 [320 355] 640 10 1))\n      world (assoc (lesson/make-world) :bodies [box ground])\n      settings (assoc lesson/env :restitution 0.75)\n      result (lesson/simulate-rigid world settings 40)]\n  (notebook/scene (lesson/world-scene result)))"}
+ {:index 18
+  :source "(letfn [(make-box [x y] {:position [x y] :width 16})\n        (show [{[x y] :position width :width}]\n          [[:fill 127] [:stroke 0] [:stroke-weight 2]\n           [:rect (- x (/ width 2)) (- y (/ width 2)) width width]])]\n  (notebook/scene (d/scene (d/background) (show (make-box 200 120)))))"}
+ {:index 19
+  :source "(let [boxes []\n      mouse [200 120]\n      boxes (conj boxes {:position mouse :width 16})\n      drawing (mapcat (fn [{[x y] :position width :width}]\n                        [[:fill 127] [:stroke 0]\n                         [:rect (- x (/ width 2)) (- y (/ width 2)) width width]]) boxes)]\n  (notebook/scene (d/scene (d/background) drawing)))"
+  :note "把鼠标事件收到的坐标作为输入；相邻Quil示例实际监听点击。"}
+ {:index 20
+  :source "(let [world (lesson/make-world)\n      boxes []]\n  {:world world :boxes boxes :dimensions [640 240]})"}
+ {:index 21
+  :source "(let [world (lesson/step-world lesson/world)]\n  (notebook/scene (lesson/world-scene world)))"}
+ {:index 22
+  :source "(letfn [(make-box [world id x y]\n          (let [width 16\n                body (ch/box-body id [x y] width width 1)]\n            {:box {:width width :body-id id}\n             :world (lesson/add-body world body)}))]\n  (make-box (lesson/make-world) 0 200 120))"
+  :note "封装层保留body-id；世界只保存一个刚体值，避免复制对象引用产生不同步状态。"}
+ {:index 23
+  :source "(let [body (assoc (ch/box-body 0 [200 120] 16 16 1) :angle 0.4)\n      points (ch/shape-points body (first (:shapes body)))]\n  (notebook/scene\n    [[:background 255] [:fill 127] [:stroke 0] [:stroke-weight 2]\n     [:polyline points true]]))"
+  :note "局部顶点绕角度旋转后平移到世界坐标，对应push/translate/rotate/pop的绘图变换。"}
+ {:index 24
+  :source "(letfn [(spawn-box [world id position]\n          (lesson/add-body world (ch/box-body id position 16 16 1)))\n        (off-screen? [height body]\n          (> (second (:position body)) (+ height 100)))\n        (advance-and-remove [world height]\n          (let [updated (lesson/step-world world)\n                expired (map :id (filter #(off-screen? height %) (:bodies updated)))]\n            (reduce lesson/remove-body updated expired)))]\n  (let [world (-> (lesson/make-world)\n                  (spawn-box 0 [200 120])\n                  (spawn-box 1 [250 400]))\n        world (advance-and-remove world 240)]\n    (notebook/scene (lesson/world-scene world))))"
+  :note "同一世界集合同时承担更新、显示与移除，避免删除显示对象后仍保留物理刚体。"}
+ {:index 25
+  :source "(let [ground (ch/static-body (ch/box-body 10 [320 355] 640 10 1))]\n  (lesson/add-body (lesson/make-world) ground))"}
+ {:index 26
+  :source "(letfn [(make-boundary [id x y width height angle]\n          (-> (ch/box-body id [x y] width height 1)\n              ch/static-body\n              (assoc :angle angle)))\n        (show [boundary] (lesson/body-scene boundary))]\n  (notebook/scene\n    (d/scene (d/background) (show (make-boundary 0 320 300 300 15 0.2)))))"}
+ {:index 27
+  :source "(let [hexagon (ch/polygon-body 0 [100 100] (ch/random-polygon 6 25) 1)\n      width 80 height 40 slope 0.25\n      trapezoid (ch/polygon-body 1 [250 100]\n                  [[(- (/ width 2)) (/ height 2)]\n                   [(/ width 2) (/ height 2)]\n                   [(* width (- 0.5 slope)) (- (/ height 2))]\n                   [(* width (- slope 0.5)) (- (/ height 2))]] 1)\n      custom (ch/polygon-body 2 [400 100] [[-20 -15] [25 -10] [10 25]] 1)]\n  (notebook/scene\n    (d/scene (d/background)\n             (lesson/body-scene hexagon) (lesson/body-scene trapezoid)\n             (lesson/body-scene custom))))"
+  :note "自定义形状须为凸多边形；凹形用多个凸子形状构成compound-body。"}
+ {:index 28
+  :source "(let [body (assoc (ch/polygon-body 0 [250 120] (ch/random-polygon 6 30) 1)\n                 :angle 0.3)\n      vertices (ch/shape-points body (first (:shapes body)))]\n  (notebook/scene\n    [[:background 255] [:fill 127] [:stroke 0] [:stroke-weight 2]\n     [:polyline vertices true]]))"}
+ {:index 29
+  :source "(let [part-a (lesson/translated-shape (ch/rectangle 40 10) [-20 0])\n      part-b (lesson/translated-shape (ch/rectangle 40 10) [20 0])\n      body (ch/compound-body 0 [250 120] [part-a part-b] 1)\n      world (lesson/add-body (lesson/make-world) body)]\n  (notebook/scene (lesson/world-scene world)))"}
+ {:index 30
+  :source "(letfn [(make-lollipop [id x y]\n          (let [circle-part {:type :circle :radius 16 :offset [0 -20]}\n                stem-part (lesson/translated-shape (ch/rectangle 8 60) [0 10])]\n            (ch/compound-body id [x y] [circle-part stem-part] 1)))\n        (show [body] (lesson/body-scene body))]\n  (notebook/scene\n    (d/scene (d/background) (show (assoc (make-lollipop 0 250 120) :angle 0.3)))))"
+  :note "圆与长柄共享位置、角度和角速度；恢复系数0.6在世界更新环境中传入。"}
+ {:index 31
+  :source "(let [body-a (ch/circle-body 0 [200 100] 10 1)\n      body-b (ch/circle-body 1 [350 100] 10 1)\n      constraint {:a 0 :b 1 :length 100 :stiffness 0.5}\n      world (assoc (lesson/make-world)\n                   :bodies [body-a body-b] :constraints [constraint])\n      bodies (ch/solve-rigid-constraint (:bodies world) constraint)]\n  {:distance (m/distance (:position (first bodies)) (:position (second bodies)))\n   :bodies bodies})"
+  :note "该求解器实现连接质心的距离约束，局部锚点均为[0 0]。"}
+ {:index 32
+  :source "(letfn [(make-pendulum [x y length]\n          (let [anchor (assoc (ch/static-body (ch/circle-body 0 [x y] 12 1))\n                              :collision? false)\n                bob (ch/circle-body 1 [(+ x length) y] 12 1)]\n            (assoc (lesson/make-world) :bodies [anchor bob]\n                   :constraints [{:a 0 :b 1 :length length :stiffness 1}])))]\n  (let [world (make-pendulum 320 60 120)\n        world (lesson/simulate-rigid world (assoc lesson/env :restitution 0.6) 40)]\n    (notebook/scene (lesson/world-scene world))))"}
+ {:index 33
+  :source "(let [body (ch/box-body 0 [320 150] 120 10 1)\n      anchor (assoc (ch/static-body (ch/circle-body 1 [320 150] 1 1))\n                    :collision? false)\n      joint {:a 0 :b 1 :length 0 :stiffness 1}\n      world (assoc (lesson/make-world) :bodies [body anchor] :constraints [joint])]\n  (notebook/scene (lesson/world-scene (lesson/step-world world))))"
+  :note "固定世界坐标以静态且不碰撞的锚点表示，零长度约束形成中心铰链。"}
+ {:index 34
+  :source "(letfn [(make-windmill [x y]\n          (lesson/hinge (ch/box-body 0 [x y] 120 10 1) [x y]))]\n  (let [world (make-windmill 320 160)\n        world (update-in world [:bodies 0] assoc :angular-velocity 0.08)\n        world (lesson/simulate-rigid world lesson/env 15)]\n    (notebook/scene (lesson/world-scene world))))"}
+ {:index 35
+  :source "(let [world (assoc (lesson/make-world) :mode :mouse :bodies [lesson/box])\n      settings (assoc lesson/env :mouse (:position lesson/box) :pressed? true)\n      selected (lesson/step-world world settings)]\n  {:dragged-id (:drag selected)\n   :position (-> selected :bodies first :position)})"
+  :note "Quil事件转成mouse与pressed?输入；求解器选取鼠标附近的动态刚体，再逐步向目标拉动。"}
+ {:index 36
+  :source "(let [world (assoc (lesson/make-world) :mode :mouse :bodies [lesson/box])\n      selected (lesson/step-world world\n                 (assoc lesson/env :mouse (:position lesson/box) :pressed? true))\n      mouse [200 80]\n      dragged (lesson/step-world selected\n                (assoc lesson/env :mouse mouse :pressed? true))\n      body (first (:bodies dragged))]\n  (notebook/scene\n    (d/scene (lesson/world-scene dragged)\n             (if (:drag dragged) (d/line (:position body) mouse) []))))"
+  :note "当前求解器使用0.25的逐步拖拽权重；不假设Matter MouseConstraint对象存在。"}
+ {:index 37
+  :source "(let [body lesson/box\n      force [0.01 0]\n      body (lesson/force-on-body body (:position body) force)]\n  (select-keys body [:velocity :angular-velocity]))"}
+ {:index 38
+  :source "(letfn [(attract [body-a body-b gravitational-constant]\n          (let [direction (m/v- (:position body-a) (:position body-b))\n                distance (m/clamp (m/mag direction) 5 25)\n                strength (/ (* gravitational-constant (:mass body-a) (:mass body-b))\n                            (* distance distance))\n                force (m/v* (m/normalize direction) strength)]\n            (lesson/force-on-body body-b (:position body-b) force)))]\n  (attract (ch/circle-body 0 [320 180] 20 10) lesson/box 0.4))"}
+ {:index 39
+  :source "(let [before lesson/event-world\n      after (lesson/step-world before (assoc lesson/env :gravity 0))]\n  {:collision-start (:events after)\n   :contact-set (:contacts after)})"
+  :note "新接触集合减去上一帧接触集合，形成collisionStart事件；重复接触不重复触发。"}
+ {:index 40
+  :source "(letfn [(handle-collisions [world events]\n          (let [by-id (into {} (map (juxt :id identity) (:bodies world)))]\n            (mapv (fn [[a b]]\n                    {:body-a (get by-id a) :body-b (get by-id b)}) events)))]\n  (let [world (lesson/step-world lesson/event-world (assoc lesson/env :gravity 0))]\n    (handle-collisions world (:events world))))"}
+ {:index 41
+  :source "(letfn [(make-particle [id x y radius]\n          (assoc (ch/circle-body id [x y] radius 1) :role :particle))]\n  (lesson/add-body (lesson/make-world) (make-particle 0 320 120 12)))"
+  :note "刚体map直接保存role与id，不需要plugin回指可变实例。"}
+ {:index 42
+  :source "(letfn [(handle-collisions [world events]\n          (let [by-id (into {} (map (juxt :id identity) (:bodies world)))\n                changed (set (mapcat identity\n                              (filter (fn [pair]\n                                        (every? #(= :particle (:role (get by-id %))) pair))\n                                      events)))]\n            (update world :bodies\n                    #(mapv (fn [body]\n                             (if (changed (:id body))\n                               (assoc body :color d/accent) body)) %))))]\n  (let [world (update lesson/event-world :bodies\n                       #(mapv (fn [body] (assoc body :role :particle)) %))\n        world (lesson/step-world world (assoc lesson/env :gravity 0))]\n    (notebook/scene\n      (lesson/world-scene (handle-collisions world (:events world))))))"}
+ {:index 43
+  :source "(let [position [100 100] velocity [2 0] acceleration [0 0.5]\n      next-velocity (m/v+ velocity acceleration)\n      next-position (m/v+ position next-velocity)]\n  {:position next-position :velocity next-velocity})"}
+ {:index 44
+  :source "(require '[noc.chapters.ch06 :as ch]\n         '[noc.lessons.ch06 :as lesson])"
+  :note "Toxiclibs由同一Clojure模块的Verlet积分、锁定节点与弹簧松弛函数替换。"}
+ {:index 45
+  :source "(let [vec2 [1 -1]\n      vec3 [1 -1 2]]\n  {:vec2 vec2 :vec3 vec3 :dimensions (mapv count [vec2 vec3])})"
+  :note "二维物理使用两个分量；三维数据仍可用普通Clojure向量表示。"}
+ {:index 46
+  :source "(let [a [1 -1] b [3 4]\n      sum (m/v+ a b)\n      copied-sum (m/v+ sum b)]\n  {:original a :sum sum :copied-sum copied-sum\n   :magnitude (m/mag sum) :unit-vector (m/normalize sum)})"
+  :note "统一使用不可变向量，addSelf的原地变更改为显式绑定新值。"}
+ {:index 47
+  :source "(let [make-world lesson/make-verlet-world\n      make-particle ch/particle\n      make-spring ch/spring\n      world (make-world)]\n  (assoc world :particles [(make-particle 0 [320 120] false)]\n               :springs []))"}
+ {:index 48
+  :source "(let [world (assoc (lesson/make-verlet-world)\n                   :particles [(lesson/particle 0 320 120 8)])\n      settings (assoc lesson/env :height 240 :gravity 0.5)\n      next-world (ch/verlet-step world settings)]\n  {:bounds [0 0 640 240]\n   :position (-> next-world :particles first :position)})"}
+ {:index 49
+  :source "(letfn [(make-particle [id x y radius]\n          (assoc (ch/particle id [x y] false) :radius radius))\n        (show [particle]\n          (d/circle (:position particle) (* 2 (:radius particle)) [127]))]\n  (notebook/scene\n    (d/scene (d/background) (show (make-particle 0 320 120 8)))))"}
+ {:index 50
+  :source "(let [particle (lesson/particle 0 320 120 8)]\n  (update (lesson/make-verlet-world) :particles conj particle))"}
+ {:index 51
+  :source "(let [length 80 strength 0.01\n      spring (ch/spring 0 1 length strength)\n      world (assoc (lesson/make-verlet-world)\n                   :particles lesson/particles :springs [spring])]\n  {:spring spring :relaxed (ch/relax-spring (:particles world) spring)})"}
+ {:index 52
+  :source "(let [world lesson/spring-world\n      mouse [400 160]\n      world (lesson/drag-particle world 1 mouse)]\n  (-> world :particles second (select-keys [:position :previous :locked?])))"
+  :note "拖拽时同步previous以避免释放后产生不期望的瞬时速度；固定节点的locked?由场景控制。"}
+ {:index 53
+  :source "(let [length 120\n      anchor (assoc (lesson/particle 0 320 20 8) :locked? true)\n      bob (lesson/particle 1 (+ 320 length) 20 8)\n      spring (ch/spring 0 1 length 0.01)\n      world {:particles [anchor bob] :springs [spring] :attractors []}\n      settings (assoc lesson/env :height 240 :gravity 0.5)\n      world (lesson/simulate-springs world settings 25)]\n  (notebook/scene (lesson/spring-scene world)))"}
+ {:index 54
+  :source "(let [total 20 spacing 10\n      particles (mapv (fn [id]\n                        (lesson/particle id (* id spacing) 10 4))\n                      (range total))]\n  (assoc (lesson/make-verlet-world) :particles particles))"}
+ {:index 55
+  :source "(let [total 20 spacing 10\n      particles (mapv #(lesson/particle % (* % spacing) 10 4) (range total))\n      springs (mapv #(ch/spring % (inc %) spacing 0.01) (range (dec total)))]\n  {:particles (assoc-in particles [0 :locked?] true)\n   :springs springs :attractors []})"}
+ {:index 56
+  :source "(let [world (lesson/simulate-springs (lesson/chain 20 10) lesson/env 20)\n      particles (:particles world)\n      points (mapv :position particles)\n      last-particle (peek particles)]\n  (notebook/scene\n    (d/scene (d/background)\n             [[:stroke 0] [:no-fill] [:polyline points false]]\n             (d/circle (:position last-particle) (* 2 (:radius last-particle)) [127]))))"}
+ {:index 57
+  :source "(letfn [(add-particle [world id x y radius]\n          (update world :particles conj (lesson/particle id x y radius)))\n        (add-spring [world a b]\n          (let [by-id (into {} (map (juxt :id identity) (:particles world)))\n                length (m/distance (:position (get by-id a)) (:position (get by-id b)))]\n            (update world :springs conj (ch/spring a b length 0.01))))]\n  (-> (lesson/make-verlet-world)\n      (add-particle 0 200 100 4)\n      (add-particle 1 300 100 4)\n      (add-spring 0 1)))"
+  :note "构造函数自动注册改为返回更新后的世界，所有状态变更明确可见。"}
+ {:index 58
+  :source "(let [positions [[200 25] [400 25] [350 125]\n                 [400 225] [200 225] [250 125]]\n      particles (mapv (fn [id [x y]] (lesson/particle id x y 4)) (range) positions)\n      links [[0 1] [1 2] [2 3] [3 4] [4 5] [5 0]\n             [5 2] [0 3] [1 4]]\n      springs (mapv (fn [[a b]]\n                      (ch/spring a b (m/distance (nth positions a) (nth positions b)) 0.01))\n                    links)\n      world {:particles particles :springs springs :attractors []}\n      world (lesson/simulate-springs world (assoc lesson/env :height 240 :gravity 0.5) 20)\n      points (mapv :position (:particles world))]\n  (notebook/scene\n    [[:background 255] [:fill 127] [:stroke 0] [:polyline points true]]))"}
+ {:index 59
+  :source "(binding [m/*rng* (m/seeded 42)]\n  (let [n 8\n        particles (mapv (fn [id]\n                          (lesson/particle id (m/random 319 321) (m/random 119 121) 4))\n                        (range n))]\n    {:particles particles :springs [] :attractors []}))"}
+ {:index 60
+  :source "(let [n 8 length 60\n      springs (vec (for [a (range n) b (range (inc a) n)]\n                     (ch/spring a b length 0.01)))]\n  {:spring-count (count springs) :springs springs})"}
+ {:index 61
+  :source "(binding [m/*rng* (m/seeded 42)]\n  (let [n (+ 2 (m/random-int 18))\n        length (m/random 10 120)\n        world (lesson/cluster n length)\n        world (lesson/simulate-springs world (assoc lesson/env :height 240 :gravity 0) 40)]\n    (notebook/scene (lesson/spring-scene world))))"}
+ {:index 62
+  :source "(let [particle (lesson/particle 0 320 120 8)\n      behavior {:position (:position particle) :radius 20 :strength 0.1}\n      world {:particles [(lesson/particle 1 330 120 4)]\n             :springs [] :attractors [behavior]}\n      next-world (ch/verlet-step world (assoc lesson/env :gravity 0))]\n  {:behavior behavior :position (-> next-world :particles first :position)})"}
+ {:index 63
+  :source "(letfn [(make-repeller [id x y radius]\n          (let [particle (lesson/particle id x y radius)]\n            {:particle particle\n             :behavior {:position (:position particle) :radius (* radius 4) :strength -1}}))]\n  (let [{:keys [particle behavior]} (make-repeller 0 320 120 8)\n        world {:particles [particle (lesson/particle 1 330 120 4)]\n               :springs [] :attractors [behavior]}\n        next-world (ch/verlet-step world (assoc lesson/env :gravity 0))]\n    (notebook/scene (lesson/spring-scene next-world))))"}
+ {:index 64
+  :source "(letfn [(make-attractor [id x y radius width]\n          (let [particle (lesson/particle id x y radius)]\n            {:particle (assoc particle :locked? true)\n             :behaviors [{:position [x y] :radius width :strength 0.1}\n                         {:position [x y] :radius radius :strength -10}]}))]\n  (let [{:keys [particle behaviors]} (make-attractor 0 320 120 20 640)\n        world {:particles [particle (lesson/particle 1 330 120 4)\n                           (lesson/particle 2 450 120 4)]\n               :springs [] :attractors behaviors}\n        next-world (ch/verlet-step world (assoc lesson/env :gravity 0))]\n    (notebook/scene (lesson/spring-scene next-world))))"
+  :note "固定吸引子供有限实验使用；近场负强度排斥、远场正强度吸引，实际交互例子允许移动吸引子。"}
+]
